@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Desafio da Tabuada por Fases</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -53,8 +54,8 @@
       font-size: 24px;
       margin-top: 10px;
     }
-    #iniciar {
-      font-size: 28px;
+    #iniciar, #proxima-fase, #reiniciar {
+      font-size: 26px;
       padding: 15px 25px;
       margin-top: 30px;
       cursor: pointer;
@@ -75,6 +76,17 @@
     <div class="question" id="pergunta"></div>
     <div class="options" id="opcoes"></div>
     <div id="resultado"></div>
+  </div>
+
+  <div class="container" id="transicao" style="display:none;">
+    <h1 id="mensagem-transicao"></h1>
+    <button id="proxima-fase" onclick="proximaFase()">Iniciar próxima fase</button>
+  </div>
+
+  <div class="container" id="fim" style="display:none;">
+    <h1>🎉 Você venceu todas as fases!</h1>
+    <p style="font-size: 24px;">Você é um mestre da multiplicação!</p>
+    <button id="reiniciar" onclick="reiniciarJogo()">Jogar novamente</button>
   </div>
 
   <script>
@@ -103,12 +115,12 @@
     function novaPergunta() {
       if (multiplicadores.length === 0) {
         if (faseAtual === 10) {
-          document.getElementById("pergunta").textContent = "🎉 Parabéns! Você venceu todas as fases!";
-          document.getElementById("opcoes").innerHTML = '';
+          document.getElementById("jogo").style.display = "none";
+          document.getElementById("fim").style.display = "block";
+          confetti();
           return;
         }
-        faseAtual++;
-        iniciarFase();
+        mostrarMensagemDeTransicao();
         return;
       }
 
@@ -163,6 +175,41 @@
         [array[i], array[j]] = [array[j], array[i]];
       }
       return array;
+    }
+
+    function mostrarMensagemDeTransicao() {
+      document.getElementById("jogo").style.display = "none";
+      document.getElementById("transicao").style.display = "block";
+      const mensagem = `🎉 Parabéns! Você concluiu a Fase ${faseAtual}!<br><br>` +
+        `Agora vai ficar mais difícil...<br>` +
+        `Será que você está preparado para a Fase ${faseAtual + 1}?`;
+      document.getElementById("mensagem-transicao").innerHTML = mensagem;
+      confetti();
+    }
+
+    function proximaFase() {
+      faseAtual++;
+      document.getElementById("transicao").style.display = "none";
+      document.getElementById("jogo").style.display = "block";
+      iniciarFase();
+    }
+
+    function reiniciarJogo() {
+      document.getElementById("fim").style.display = "none";
+      document.getElementById("inicio").style.display = "block";
+    }
+
+    function confetti() {
+      confettiLib();
+      setTimeout(confettiLib, 400);
+    }
+
+    function confettiLib() {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
     }
   </script>
 
