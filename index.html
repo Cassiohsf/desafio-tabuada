@@ -2,122 +2,149 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Desafio da Multiplicação</title>
+  <title>Desafio da Tabuada por Fases</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f0f8ff;
       text-align: center;
-      padding: 10px;
       margin: 0;
+      padding: 20px;
     }
-
     .container {
       background: white;
-      padding: 40px 20px;
-      display: inline-block;
+      padding: 30px;
       border-radius: 16px;
       box-shadow: 0 0 20px #aaa;
       max-width: 95%;
+      margin: auto;
     }
-
     h1 {
+      font-size: 36px;
       color: #333366;
-      font-size: 40px;
-      margin-bottom: 35px;
     }
-
     .question {
-      font-size: 38px;
-      margin-bottom: 35px;
+      font-size: 32px;
+      margin: 30px 0;
     }
-
     .options {
       display: flex;
       flex-direction: column;
-      gap: 30px;
-      margin-bottom: 35px;
+      gap: 20px;
+      margin-bottom: 20px;
     }
-
     .option {
+      font-size: 28px;
+      padding: 20px;
       background-color: #eeeeff;
-      border: 3px solid #bbb;
-      border-radius: 18px;
-      padding: 30px;
-      font-size: 34px;
+      border: 3px solid #ccc;
+      border-radius: 12px;
       cursor: pointer;
-      transition: 0.2s;
     }
-
     .option:hover {
       background-color: #d0d0ff;
     }
-
     #resultado {
-      font-size: 30px;
-      margin-top: 20px;
+      font-size: 26px;
+      margin-top: 15px;
     }
-
-    #pontos {
+    #fase {
+      font-size: 24px;
+      margin-top: 10px;
+    }
+    #iniciar {
       font-size: 28px;
-      font-weight: bold;
-    }
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 36px;
-      }
-      .question {
-        font-size: 34px;
-      }
-      .option {
-        font-size: 30px;
-        padding: 25px;
-      }
-      #resultado {
-        font-size: 26px;
-      }
-      #pontos {
-        font-size: 24px;
-      }
+      padding: 15px 25px;
+      margin-top: 30px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
+  <div class="container" id="inicio">
+    <h1>Você está pronto para o desafio?</h1>
+    <p style="font-size: 24px;">Acerte toda a tabuada de cada fase e avance até a tabuada do 10!<br><strong>Mas cuidado: se errar, volta para o início!</strong></p>
+    <button id="iniciar" onclick="iniciarJogo()">Começar o Desafio</button>
+  </div>
+
+  <div class="container" id="jogo" style="display:none;">
     <h1>Desafio da Multiplicação</h1>
-    <div class="question" id="pergunta">Quanto é 3 × 1?</div>
+    <div id="fase">Fase: Tabuada do 1</div>
+    <div class="question" id="pergunta"></div>
     <div class="options" id="opcoes"></div>
     <div id="resultado"></div>
-    <p>Pontuação: <span id="pontos">0</span></p>
   </div>
 
   <script>
-    let multiplicando, multiplicador;
-    let pontos = 0;
+    let faseAtual = 1;
+    let multiplicadores = [];
+    let multiplicando = 1;
+
+    function iniciarJogo() {
+      document.getElementById("inicio").style.display = "none";
+      document.getElementById("jogo").style.display = "block";
+      faseAtual = 1;
+      iniciarFase();
+    }
+
+    function iniciarFase() {
+      multiplicando = faseAtual;
+      multiplicadores = embaralharArray([1,2,3,4,5,6,7,8,9,10]);
+      atualizarFase();
+      novaPergunta();
+    }
+
+    function atualizarFase() {
+      document.getElementById("fase").textContent = "Fase: Tabuada do " + faseAtual;
+    }
 
     function novaPergunta() {
-      const tabuadas = [3, 4];
-      multiplicando = tabuadas[Math.floor(Math.random() * tabuadas.length)];
-      multiplicador = Math.floor(Math.random() * 10) + 1;
+      if (multiplicadores.length === 0) {
+        if (faseAtual === 10) {
+          document.getElementById("pergunta").textContent = "🎉 Parabéns! Você venceu todas as fases!";
+          document.getElementById("opcoes").innerHTML = '';
+          return;
+        }
+        faseAtual++;
+        iniciarFase();
+        return;
+      }
 
-      const correta = multiplicando * multiplicador;
-      const opcoes = gerarOpcoes(correta);
-
+      let multiplicador = multiplicadores.pop();
+      let correta = multiplicando * multiplicador;
       document.getElementById("pergunta").textContent = `Quanto é ${multiplicando} × ${multiplicador}?`;
-      document.getElementById("opcoes").innerHTML = '';
+
+      let opcoes = gerarOpcoes(correta);
+      let opcoesDiv = document.getElementById("opcoes");
+      opcoesDiv.innerHTML = '';
 
       opcoes.forEach(valor => {
         const botao = document.createElement("button");
         botao.className = "option";
         botao.textContent = valor;
-        botao.onclick = () => verificarResposta(valor);
-        document.getElementById("opcoes").appendChild(botao);
+        botao.onclick = () => verificarResposta(valor, correta);
+        opcoesDiv.appendChild(botao);
       });
 
       document.getElementById("resultado").textContent = '';
+    }
+
+    function verificarResposta(resposta, correta) {
+      const resultado = document.getElementById("resultado");
+      if (resposta === correta) {
+        resultado.textContent = "✅ Acertou!";
+        resultado.style.color = "green";
+        setTimeout(novaPergunta, 1000);
+      } else {
+        resultado.textContent = "❌ Errou! Você voltará para a fase 1.";
+        resultado.style.color = "red";
+        setTimeout(() => {
+          faseAtual = 1;
+          iniciarFase();
+        }, 1500);
+      }
     }
 
     function gerarOpcoes(correta) {
@@ -130,24 +157,13 @@
       return Array.from(opcoes).sort(() => Math.random() - 0.5);
     }
 
-    function verificarResposta(resposta) {
-      const correta = multiplicando * multiplicador;
-      const resultado = document.getElementById("resultado");
-
-      if (resposta === correta) {
-        pontos++;
-        resultado.textContent = "✅ Acertou!";
-        resultado.style.color = "green";
-      } else {
-        resultado.textContent = `❌ Errou! A resposta correta é ${correta}`;
-        resultado.style.color = "red";
+    function embaralharArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
       }
-
-      document.getElementById("pontos").textContent = pontos;
-      setTimeout(novaPergunta, 1500);
+      return array;
     }
-
-    novaPergunta();
   </script>
 
 </body>
