@@ -2,28 +2,46 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Jogo da Tabuada - 3 e 4</title>
+  <title>Desafio da Multiplicação</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
       text-align: center;
       padding: 40px;
-      background-color: #f0f8ff;
-    }
-    h1 {
-      color: #333366;
     }
     .container {
       background: white;
       padding: 30px;
       display: inline-block;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #aaa;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #aaa;
     }
-    input, button {
-      padding: 10px;
-      font-size: 18px;
-      margin: 10px;
+    h1 {
+      color: #333366;
+      margin-bottom: 20px;
+    }
+    .question {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .options {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .option {
+      background-color: #eeeeff;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      padding: 15px 30px;
+      font-size: 20px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .option:hover {
+      background-color: #ddd;
     }
     #resultado {
       font-size: 20px;
@@ -34,11 +52,10 @@
 <body>
 
   <div class="container">
-    <h1>🧠 Jogo da Tabuada – 3 e 4</h1>
-    <p id="pergunta">Quanto é 3 × 1?</p>
-    <input type="number" id="resposta" placeholder="Digite sua resposta" />
-    <button onclick="verificarResposta()">Responder</button>
-    <p id="resultado"></p>
+    <h1>Desafio da Multiplicação</h1>
+    <div class="question" id="pergunta">Quanto é 3 × 1?</div>
+    <div class="options" id="opcoes"></div>
+    <div id="resultado"></div>
     <p>Pontuação: <span id="pontos">0</span></p>
   </div>
 
@@ -50,22 +67,44 @@
       const tabuadas = [3, 4];
       multiplicando = tabuadas[Math.floor(Math.random() * tabuadas.length)];
       multiplicador = Math.floor(Math.random() * 10) + 1;
+
+      const correta = multiplicando * multiplicador;
+      const opcoes = gerarOpcoes(correta);
+
       document.getElementById("pergunta").textContent = `Quanto é ${multiplicando} × ${multiplicador}?`;
-      document.getElementById("resposta").value = '';
-      document.getElementById("resposta").focus();
+      document.getElementById("opcoes").innerHTML = '';
+
+      opcoes.forEach(valor => {
+        const botao = document.createElement("button");
+        botao.className = "option";
+        botao.textContent = valor;
+        botao.onclick = () => verificarResposta(valor);
+        document.getElementById("opcoes").appendChild(botao);
+      });
+
+      document.getElementById("resultado").textContent = '';
     }
 
-    function verificarResposta() {
-      const resposta = parseInt(document.getElementById("resposta").value);
-      const resultadoCerto = multiplicando * multiplicador;
+    function gerarOpcoes(correta) {
+      const opcoes = new Set();
+      opcoes.add(correta);
+      while (opcoes.size < 3) {
+        const fake = correta + Math.floor(Math.random() * 11 - 5);
+        if (fake > 0 && fake !== correta) opcoes.add(fake);
+      }
+      return Array.from(opcoes).sort(() => Math.random() - 0.5);
+    }
+
+    function verificarResposta(resposta) {
+      const correta = multiplicando * multiplicador;
       const resultado = document.getElementById("resultado");
 
-      if (resposta === resultadoCerto) {
+      if (resposta === correta) {
         pontos++;
         resultado.textContent = "✅ Acertou!";
         resultado.style.color = "green";
       } else {
-        resultado.textContent = `❌ Errou! A resposta correta é ${resultadoCerto}`;
+        resultado.textContent = `❌ Errou! A resposta correta é ${correta}`;
         resultado.style.color = "red";
       }
 
