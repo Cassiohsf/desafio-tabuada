@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Jogo da Tabuada - 3 e 4</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+      background-color: #f0f8ff;
+    }
+    h1 {
+      color: #333366;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      display: inline-block;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #aaa;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 18px;
+      margin: 10px;
+    }
+    #resultado {
+      font-size: 20px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🧠 Jogo da Tabuada – 3 e 4</h1>
+    <p id="pergunta">Quanto é 3 × 1?</p>
+    <input type="number" id="resposta" placeholder="Digite sua resposta" />
+    <button onclick="verificarResposta()">Responder</button>
+    <p id="resultado"></p>
+    <p>Pontuação: <span id="pontos">0</span></p>
+  </div>
+
+  <script>
+    let multiplicando, multiplicador;
+    let pontos = 0;
+
+    function novaPergunta() {
+      const tabuadas = [3, 4];
+      multiplicando = tabuadas[Math.floor(Math.random() * tabuadas.length)];
+      multiplicador = Math.floor(Math.random() * 10) + 1;
+      document.getElementById("pergunta").textContent = `Quanto é ${multiplicando} × ${multiplicador}?`;
+      document.getElementById("resposta").value = '';
+      document.getElementById("resposta").focus();
+    }
+
+    function verificarResposta() {
+      const resposta = parseInt(document.getElementById("resposta").value);
+      const resultadoCerto = multiplicando * multiplicador;
+      const resultado = document.getElementById("resultado");
+
+      if (resposta === resultadoCerto) {
+        pontos++;
+        resultado.textContent = "✅ Acertou!";
+        resultado.style.color = "green";
+      } else {
+        resultado.textContent = `❌ Errou! A resposta correta é ${resultadoCerto}`;
+        resultado.style.color = "red";
+      }
+
+      document.getElementById("pontos").textContent = pontos;
+      setTimeout(novaPergunta, 1500);
+    }
+
+    novaPergunta();
+  </script>
+
+</body>
+</html>
